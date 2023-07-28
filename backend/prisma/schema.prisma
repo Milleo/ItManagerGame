@@ -12,7 +12,7 @@ model User {
   name      String    @db.VarChar(100)
   email     String    @unique @db.VarChar(100)
   password  String    @db.Char(36)
-  banned    Boolean
+  banned    Boolean?
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   deletedAt DateTime?
