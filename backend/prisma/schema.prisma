@@ -15,7 +15,6 @@ model User {
   banned    Boolean?
   createdAt DateTime  @default(now())
   updatedAt DateTime?
-  deletedAt DateTime?
 
   @@map("users")
 }
