@@ -3,6 +3,7 @@ import { UserRegisterDTO } from "./dto/userRegister.dto";
 import { Injectable } from "@nestjs/common";
 import { UserUpdateDTO } from "./dto/userUpdate.dto";
 import { UserDeleteDTO } from "./dto/userDelete.dto";
+import { UserUpdatePartialDTO } from "./dto/userUpdatePartial.dto";
 
 @Injectable()
 export class UserService{
@@ -36,13 +37,21 @@ export class UserService{
     });
   };
 
+  async updatePartial({id, ...data }: UserUpdatePartialDTO){
+    return await this.prisma.user.update({
+      data: {
+        ...data
+      }, where: { id }
+    });
+  }
+
   async delete({id}: UserDeleteDTO){
     return await this.prisma.user.delete({
       where: { id }
     });
   }
 
-  async exists(email: string){
+  async emailAlreadyExists(email: string){
     return await this.prisma.user.count({ where: { email }});
   }
 }

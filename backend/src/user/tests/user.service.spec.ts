@@ -30,7 +30,7 @@ describe("UserService", () => {
   });
 
   it("E-mail already exists", async () => {
-    const response = await service.exists(fakeUsers[0].email);
+    const response = await service.emailAlreadyExists(fakeUsers[0].email);
     
     expect(response).toEqual(1);
     expect(prisma.user.count).toHaveBeenCalledTimes(1);
@@ -39,7 +39,7 @@ describe("UserService", () => {
 
   it("E-mail dosen't exists", async () => {
     const newEmail = "emailaddressunique@email.com";
-    const response = await service.exists(newEmail);
+    const response = await service.emailAlreadyExists(newEmail);
 
     expect(response).toEqual(0);
     expect(prisma.user.count).toHaveBeenCalledTimes(1);
@@ -59,7 +59,7 @@ describe("UserService", () => {
     delete newUser.id;
     const response = await service.create(newUser);
 
-    expect(response).toEqual(fakeUsers[0]);
+    expect(response).toEqual({ data: newUser });
     expect(prisma.user.create).toHaveBeenCalledTimes(1);
     expect(prisma.user.create).toHaveBeenCalledWith({ data: newUser });
   });
@@ -74,9 +74,48 @@ describe("UserService", () => {
     
     const response = await service.update({ id: userId, ...updatedUser });
 
-    expect(response).toEqual(fakeUsers[0]);
+    expect(response).toEqual(updatedUser);
     expect(prisma.user.update).toHaveBeenCalledTimes(1);
     expect(prisma.user.update).toHaveBeenCalledWith({ data: updatedUser ,  where: { id: userId }});
+  });
+
+  it("Update user name", async () => {
+    const updateUser = {
+      id: fakeUsers[0].id,
+      name: 'User name ONLY UPDATED'
+    }
+    
+    const response = await service.updatePartial(updateUser);
+
+    expect(expect.objectContaining(response)).toEqual(updateUser);
+    expect(prisma.user.update).toHaveBeenCalledTimes(1);
+    expect(prisma.user.update).toHaveBeenCalledWith({ data: { name: updateUser.name } ,  where: { id: updateUser.id }});
+  });
+
+  it("Update user email", async () => {
+    const updateUser = {
+      id: fakeUsers[0].id,
+      email: 'userNEW@email.com'
+    }
+    
+    const response = await service.updatePartial(updateUser);
+
+    expect(expect.objectContaining(response)).toEqual(updateUser);
+    expect(prisma.user.update).toHaveBeenCalledTimes(1);
+    expect(prisma.user.update).toHaveBeenCalledWith({ data: { email: updateUser.email } ,  where: { id: updateUser.id }});
+  });
+
+  it("Update user password", async () => {
+    const updateUser = {
+      id: fakeUsers[0].id,
+      password: 'Pas$w0rdCHANGED'
+    }
+    
+    const response = await service.updatePartial(updateUser);
+
+    expect(expect.objectContaining(response)).toEqual(updateUser);
+    expect(prisma.user.update).toHaveBeenCalledTimes(1);
+    expect(prisma.user.update).toHaveBeenCalledWith({ data: { password: updateUser.password } ,  where: { id: updateUser.id }});
   });
 
   it("Delete user", async () => {
